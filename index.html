@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Spaceship Game</title>
+    <style>
+        #game {
+            background: black;
+            touch-action: none; /* Prevent default touch behaviors */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="game" width="300" height="300"></canvas>
+    <button id="thrust">Thrust</button>
+    <input id="steering" type="range" min="-1" max="1" step="0.01" value="0">
+    <script>
+        let canvas = document.getElementById('game');
+        let ctx = canvas.getContext('2d');
+        let thrustButton = document.getElementById('thrust');
+        let steeringSlider = document.getElementById('steering');
+
+        let ship = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            dx: 0,
+            dy: 0,
+            direction: 0,
+        };
+
+        thrustButton.addEventListener('mousedown', function() {
+            ship.dx += 0.1 * Math.cos(ship.direction);
+            ship.dy += 0.1 * Math.sin(ship.direction);
+        });
+
+        thrustButton.addEventListener('touchstart', function(event) {
+            event.preventDefault();
+            ship.dx += 0.1 * Math.cos(ship.direction);
+            ship.dy += 0.1 * Math.sin(ship.direction);
+        });
+
+        steeringSlider.addEventListener('input', function(e) {
+            ship.direction = e.target.value * Math.PI;
+        });
+
+        function update() {
+            ship.x += ship.dx;
+            ship.y += ship.dy;
+
+            if (ship.x > canvas.width) {
+                ship.dx = -Math.abs(ship.dx);
+            } else if (ship.x < 0) {
+                ship.dx = Math.abs(ship.dx);
+            }
+
+            if (ship.y > canvas.height) {
+                ship.dy = -Math.abs(ship.dy);
+            } else if (ship.y < 0) {
+                ship.dy = Math.abs(ship.dy);
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw triangle
+            ctx.save();
+            ctx.translate(ship.x, ship.y);
+            ctx.rotate(ship.direction);
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.lineTo(7, 10);
+            ctx.lineTo(-7, 10);
+            ctx.closePath();
+            ctx.fillStyle = 'purple';
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
